@@ -1,79 +1,83 @@
+import 'package:blog_web/blog_post.dart';
+import 'package:blog_web/blog_scaffold.dart';
 import 'package:blog_web/constrained_centre.dart';
+import 'package:blog_web/user.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+
+import 'blog_page.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(),
-      body: Align(
-        alignment: Alignment.topCenter,
-        child: Container(
-          width: 612,
-          padding: const EdgeInsets.symmetric(horizontal: 18),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const ConstrainedCentre(
-                child: CircleAvatar(
-                  backgroundImage: NetworkImage(
-                      'https://avatars.githubusercontent.com/u/42906958?v=4'),
-                  radius: 72,
-                ),
-              ),
-              const SizedBox(height: 18),
-              ConstrainedCentre(
-                child: SelectableText(
-                  'Flutter Dev',
-                  style: Theme.of(context).textTheme.headline1,
-                ),
-              ),
-              const SizedBox(height: 40),
-              ConstrainedCentre(
-                child: SelectableText(
-                  "Hello, I'm Ugur. I'm a flutter developer.",
-                  style: Theme.of(context).textTheme.bodyText2,
-                ),
-              ),
-              const SizedBox(height: 40),
-              SelectableText(
-                'Blog',
-                style: Theme.of(context).textTheme.headline2,
-              ),
-              const BlogListTile(),
-            ],
+    final posts = Provider.of<List<BlogPost>>(context);
+    final user = Provider.of<User>(context);
+    return BlogScaffold(
+      children: [
+        ConstrainedCentre(
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(user.profilePicture),
+            radius: 72,
           ),
         ),
-      ),
+        const SizedBox(height: 18),
+        ConstrainedCentre(
+          child: SelectableText(
+            user.name,
+            style: Theme.of(context).textTheme.headline1,
+          ),
+        ),
+        const SizedBox(height: 40),
+        ConstrainedCentre(
+          child: SelectableText(
+            "Hello, I'm Ugur. I'm a flutter developer.",
+            style: Theme.of(context).textTheme.bodyText2,
+          ),
+        ),
+        const SizedBox(height: 40),
+        SelectableText(
+          'Blog',
+          style: Theme.of(context).textTheme.headline2,
+        ),
+        for (var post in posts)
+          BlogListTile(
+            post: post,
+          ),
+      ],
     );
   }
 }
 
 class BlogListTile extends StatelessWidget {
-  const BlogListTile({Key? key}) : super(key: key);
-
+  const BlogListTile({Key? key, required this.post}) : super(key: key);
+  final BlogPost post;
   @override
   Widget build(BuildContext context) {
-    final blogTitle = Provider.of<String>(context);
-    final date = Provider.of<DateTime>(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 20),
         InkWell(
           child: Text(
-            blogTitle,
+            post.title,
             style: const TextStyle(color: Colors.blueAccent),
           ),
-          onTap: () {},
+          onTap: () {
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) {
+                  return BlogPage(blogPost: post);
+                },
+              ),
+            );
+          },
         ),
         const SizedBox(height: 10),
         SelectableText(
-          DateFormat('d MMMM y').format(date),
+          post.date,
           style: Theme.of(context).textTheme.caption,
         )
       ],

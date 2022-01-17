@@ -1,3 +1,5 @@
+import 'package:blog_web/blog_post.dart';
+import 'package:blog_web/user.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -34,16 +36,34 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Provider(
-      create: (context) => DateTime(2020, 1, 2),
-      child: Provider<String>(
-        create: (BuildContext context) => 'What is provider ?',
-        child: MaterialApp(
-          title: 'Flutter Dev Blog',
-          theme: theme,
-          home: const HomePage(),
-        ),
+    return MultiProvider(
+      providers: [
+        Provider<List<BlogPost>>(create: (context) => _blogPost),
+        Provider<User>(
+          create: (context) => User(
+              name: 'Flutter Dev',
+              profilePicture:
+                  'https://avatars.githubusercontent.com/u/42906958?v=4'),
+        )
+      ],
+      child: MaterialApp(
+        title: 'Flutter Dev Blog',
+        theme: theme,
+        home: const HomePage(),
       ),
     );
   }
 }
+
+final _blogPost = [
+  BlogPost(
+    title: 'What is provider ? ',
+    publishedDate: DateTime(2020, 1, 2),
+    body: "Provider",
+  ),
+  BlogPost(
+    title: 'What is multi-provider ? ',
+    publishedDate: DateTime(2020, 2, 3),
+    body: "Multi Provider",
+  ),
+];
